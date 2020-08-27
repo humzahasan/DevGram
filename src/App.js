@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react';
+import Post from './Post';
 import './App.css';
+import {db, auth} from './firebase';
 import Modal from '@material-ui/core/Modal';
 import {makeStyles} from '@material-ui/core/styles';
-import Post from './Post';
-import {db, auth} from './firebase';
 import {Button, Input} from '@material-ui/core';
 
 function getModalStyle() {
@@ -32,13 +32,14 @@ function App() {
   const [modalStyle] = useState(getModalStyle);
   const [posts, setPosts] = useState([]);
   const [open, setOpen] = useState(false);
+  const [openSignIn, setOpenSignIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    auth.onAuthStateChanged((authUser) => {
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
       if (authUser) {
         console.log(authUser);
         setUser(authUser);
@@ -46,7 +47,11 @@ function App() {
         setUser(null);
       }
     });
-  }, []);
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user, username]);
 
   useEffect(() => {
     db.collection('posts').onSnapshot((snapshot) => {
@@ -58,10 +63,29 @@ function App() {
     event.preventDefault();
     auth
       .createUserWithEmailAndPassword(email, password)
+      .then((authUser) => {
+        return authUser.user.updateProfile({
+          displayName: username,
+        });
+      })
       .catch((error) => alert(error.message));
+
+    setOpen(false);
   };
+
+  const SignIn = (event) => {
+    event.preventDefault();
+
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .catch((error) => alert(error.message));
+
+    setOpenSignIn(false);
+  };
+
   return (
     <div className='app'>
+      {/*Sign Up Modal*/}
       <Modal open={open} onClose={() => setOpen(false)}>
         <div style={modalStyle} className={classes.paper}>
           <form className='app_signup'>
@@ -91,10 +115,42 @@ function App() {
         </div>
       </Modal>
 
+      {/* Sign In Modal */}
+      <Modal open={openSignIn} onClose={() => setOpenSignIn(false)}>
+        <div style={modalStyle} className={classes.paper}>
+          <form className='app_signin'>
+            <center>
+              <h2>DevGram</h2>
+            </center>
+            <Input
+              type='text'
+              placeholder='Email'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Input
+              type='text'
+              placeholder='Password'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button onClick={SignIn}>Sign In</Button>
+          </form>
+        </div>
+      </Modal>
+
       <div className='app_header'>
         <h2>DevGram</h2>
       </div>
-      <Button onClick={() => setOpen(true)}>Sign Up</Button>
+
+      {user ? (
+        <Button onClick={() => auth.signOut()}>LogOut</Button>
+      ) : (
+        <div className='app_credential'>
+          <Button onClick={() => setOpenSignIn(true)}>Sign In</Button>
+          <Button onClick={() => setOpen(true)}>Sign Up</Button>
+        </div>
+      )}
       {posts.map(({id, post}) => (
         <Post
           key={id}

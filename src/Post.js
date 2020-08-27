@@ -12,7 +12,7 @@ const Post = ({username, imageUrl, caption}) => {
         />
         <h3>{username}</h3>
       </div>
-      <img className='post_image' alt='image' src={imageUrl} />
+      <img className='post_image' alt={`im$`} src={imageUrl} />
 
       <h4 className='post_text'>
         <strong>{username}</strong> {caption}
