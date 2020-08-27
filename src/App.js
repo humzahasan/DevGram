@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import Post from './Post';
+import ImageUpload from './ImageUpload'
 import './App.css';
 import {db, auth} from './firebase';
 import Modal from '@material-ui/core/Modal';
@@ -43,7 +44,7 @@ function App() {
       if (authUser) {
         console.log(authUser);
         setUser(authUser);
-      } else {
+      }  else {
         setUser(null);
       }
     });
@@ -82,7 +83,7 @@ function App() {
 
     setOpenSignIn(false);
   };
-
+  console.log(posts)
   return (
     <div className='app'>
       {/*Sign Up Modal*/}
@@ -141,6 +142,7 @@ function App() {
 
       <div className='app_header'>
         <h2>DevGram</h2>
+  <p>{user?.displayName}</p>
       </div>
 
       {user ? (
@@ -159,6 +161,9 @@ function App() {
           caption={post.caption}
         />
       ))}
+      {user?.displayName ? (<ImageUpload username={user.displayName}/>) : 
+      (<h3>Please Login to upload file</h3>) }
+      
     </div>
   );
 }
