@@ -19,11 +19,17 @@
 .app_signup {
   display : flex;
   flex-direction: column;
+  padding: 20px;
+  margin: 10px;
+  border : 1px solid lightslategray;
 }
 
 .app_signin {
   display : flex;
   flex-direction: column;
+  padding: 20px;
+  margin: 10px;
+  border : 1px solid lightslategray;
 }
 
 .app_post {

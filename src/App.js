@@ -6,17 +6,18 @@ import {db, auth} from './firebase';
 import Modal from '@material-ui/core/Modal';
 import {makeStyles} from '@material-ui/core/styles';
 import {Button, Input} from '@material-ui/core';
+import logo from './devgram.png';
 
 function getModalStyle() {
   const top = 50;
   const left = 50;
-
   return {
     top: `${top}%`,
     left: `${left}%`,
     transform: `translate(-${top}%, -${left}%)`,
   };
 }
+
 const useStyles = makeStyles((theme) => ({
   paper: {
     position: 'absolute',
@@ -48,7 +49,6 @@ function App() {
         setUser(null);
       }
     });
-
     return () => {
       unsubscribe();
     };
@@ -70,20 +70,17 @@ function App() {
         });
       })
       .catch((error) => alert(error.message));
-
     setOpen(false);
   };
 
   const SignIn = (event) => {
     event.preventDefault();
-
     auth
       .signInWithEmailAndPassword(email, password)
       .catch((error) => alert(error.message));
-
     setOpenSignIn(false);
   };
-  console.log(posts);
+
   return (
     <div className='app'>
       {/*Sign Up Modal*/}
@@ -91,7 +88,7 @@ function App() {
         <div style={modalStyle} className={classes.paper}>
           <form className='app_signup'>
             <center>
-              <h2>DevGram</h2>
+              <img src={logo} alt='logo' />
             </center>
             <Input
               type='text'
@@ -106,7 +103,7 @@ function App() {
               onChange={(e) => setEmail(e.target.value)}
             />
             <Input
-              type='text'
+              type='password'
               placeholder='Password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -121,7 +118,7 @@ function App() {
         <div style={modalStyle} className={classes.paper}>
           <form className='app_signin'>
             <center>
-              <h2>DevGram</h2>
+              <img src={logo} alt='logo' />
             </center>
             <Input
               type='text'
@@ -130,7 +127,7 @@ function App() {
               onChange={(e) => setEmail(e.target.value)}
             />
             <Input
-              type='text'
+              type='password'
               placeholder='Password'
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -141,7 +138,8 @@ function App() {
       </Modal>
 
       <div className='app_header'>
-        <h2>DevGram</h2>
+        <img src={logo} style={{height: '60px'}} alt='logo' />
+        <h4>{user?.displayName}</h4>
         {user ? (
           <Button onClick={() => auth.signOut()}>LogOut</Button>
         ) : (
@@ -153,16 +151,16 @@ function App() {
       </div>
 
       <div className='app_post'>
-        <center>
         {posts.map(({id, post}) => (
           <Post
             key={id}
+            postId={id}
             username={post.username}
             imageUrl={post.imageUrl}
             caption={post.caption}
+            user={user}
           />
         ))}
-        </center>
       </div>
       {user?.displayName ? (
         <ImageUpload username={user.displayName} />
