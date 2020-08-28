@@ -51,7 +51,7 @@ function ImageUpload({username}) {
 
             setProgress(0);
             setCaption('');
-            setImage(null);
+            setImage('');
           });
       }
     );
